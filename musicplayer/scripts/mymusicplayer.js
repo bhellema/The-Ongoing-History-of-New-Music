@@ -94,7 +94,7 @@
 	}
 
 	/**
-	* Plays the audio found at the incoming url.
+	* Plays the audio found at the given url.
 	* @method playNewSong
 	* @Param srcUrl {String} the url of an audio file
 	*/
@@ -115,7 +115,7 @@
 		$.ajax({
   			url: "http://s3.amazonaws.com/clottonmusic/albuminfo/" + artistId,
 			crossdomain: true,
-			//incomingJsonAlbumInfo is the server's json response to this request, if successful...
+			//incomingJsonAlbumInfo is the web service's json response to this request, if successful...
   			success: function(incomingJsonAlbumInfo) {
 				var albumData = incomingJsonAlbumInfo;
 				console.log("Album Data Received : " + "album: " + albumData.album + " release date: " + albumData.date + " bio: " + albumData.bio);
@@ -143,6 +143,7 @@
 			crossdomain: true,
   			success: function(incomingJsonPlaylist) {
 				playlistData = incomingJsonPlaylist;
+				//Once we have the music catalogue from the service, fire up the UI and reference data...
 				initInterface(playlistData);
 				initSongLocationMap(playlistData);
 				showMessage("Albums loaded.  Ready to rock.");
@@ -156,7 +157,13 @@
 		
 	}
 	
+	/**
+	 * Initialize the entire UI once the user has triggered an initial GET of album info.
+	 * @method initInterface
+	 * @param json {Object} a list of album information objects, such as urls of the album image, artists name.
+	 */
 	function initInterface(json) {
+		//For each album in the catalogue given to use by the server, add it as a div to the bottom bar...
 		$.each(json, function (i, item) {
 			$("<image/>", {
 				src: item.image,
@@ -167,10 +174,15 @@
 				id: item.artist
 			}).appendTo(".bottombar"));
 		});
+		//assign the IFrame's selection div to a global jquery variable so we have a reference to it...
 		$selectionDiv = $("#playWindow").contents().find("#selection");
+		//Make albums in the catalogue draggable by the user...
 		makeAlbumsDraggable();
+		//Make the catalogue visible to the user...
 		showArtists();
+		//enable the music player...
 		turnOnIpod();
+		//create a reference to the HTML5 audio player from the IFrame...
 		audioPlayer = $("#playWindow").contents().find("#player")[0];
 		
 
@@ -178,7 +190,7 @@
 	
 	/**
 	 * "Powers up" the IPod.  Makes the IFrame visible and enables controls.
-	 * /
+	 */
 	function turnOnIpod() {
 		$selectionDiv.css("font-family", "Trebuchet MS");
 		$selectionDiv.css("font-size", "13px");
@@ -191,7 +203,7 @@
 	/**
 	 * Introduces the catalogue of music into the UI's field of view by sliding it into place.
 	 * @method showArtists
-	 * /
+	 */
 	function showArtists() {
 		$(".bottombar").animate({width:"show"}, "slow");	
 	}
@@ -200,7 +212,7 @@
 	 * Introduces the biography or "factoid" about the currently playing album into the UI's field of view with a grow effect.
 	 * @method showAlbumBio
 	 * @param bio {String} The text making up the information to be read by the user.
-	 * /
+	 */
 	function showAlbumBio(bio) {
 		$("#albumInfoDiv").html(bio);
 		$("#albumInfoDiv").show("scale", 400);
@@ -210,7 +222,7 @@
 	 * Shows the given text in the message area of the UI, ie, the top bar.  Uses a slide effect.
 	 * @method showMessage
 	 * @param newMessageString {String} the message to show.
-	 * /
+	 */
 	function showMessage(newMessageString) {
 		$("#message").html(newMessageString);
 		$("#message").show("slide",{direction: "right"},  500);
@@ -219,7 +231,7 @@
 	/**
 	 * Makes any album div draggable by the user.
 	 * @method makeAlbumsDraggable
-	 * /
+	 */
 	function makeAlbumsDraggable() {
 		$(".albumDiv").draggable({iframeFix: true, revert: function (event, ui) { return !event; } } );
 	}
