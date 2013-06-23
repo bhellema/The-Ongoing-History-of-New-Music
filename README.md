@@ -16,7 +16,9 @@ Enjoy.
 
 How does it work?
 -----------------
-* A catalogue of music, along with album covers and factoids is hosted on an Amazon s3 bucket.  
+* A catalogue of music, along with album covers and factoids is hosted on an Amazon s3 bucket. 
+* The Amazon S3 bucket mimics a real restful web service, backed by a db.  Instead, static json files are hosted.  
+* (Creating a true restful web service with db is outside the scope of this exercise)
 * Once powered up, ajax calls fetch the album covers along with the url for the music file.  This allows the music catalogue to change dynamically
 without altering your locally hosted music player.
 * When an album is selected, the music player streams the song, and an ajax call fetches json data for the
