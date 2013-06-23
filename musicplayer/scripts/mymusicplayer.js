@@ -1,7 +1,12 @@
+	//A reference to the currently playing artist.  Used to request more info about the album from the web service...
 	var currentArtistId = null;
+	//A reference to an HTML5 audio player...
 	var audioPlayer = null;
+	//A reference to album data such as album name, release date, artist, etc.
 	var playlistData = null;
+	//A key/value map with artist Ids and their corresponding song file url...
 	var songLocationMap = null;
+	//A jquery object representing a refernce to the IPod's display screen (the IFrame).
 	var $selectionDiv = null;
 	
 	$(document).ready(function() {
