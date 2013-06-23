@@ -1,19 +1,25 @@
 	//A reference to the currently playing artist.  Used to request more info about the album from the web service...
 	var currentArtistId = null;
+	
 	//A reference to an HTML5 audio player...
 	var audioPlayer = null;
+	
 	//A reference to album data such as album name, release date, artist, etc.
 	var playlistData = null;
+	
 	//A key/value map with artist Ids and their corresponding song file url...
 	var songLocationMap = null;
+	
 	//A jquery object representing a refernce to the IPod's display screen (the IFrame).
 	var $selectionDiv = null;
 	
 	$(document).ready(function() {
-		//If it can be hiddlen, hide it at the start, before the application is "powered on" by the user....
+		//If it can be hidden, hide it at the start, before the application is "powered on" by the user....
 		$(".hideable").hide();
+		
 		//Anything that is "startable" can be clicked and has the ability to "power on" the application...
 		$(".startable").click(function(e) {
+        	
         	//If something that can start the application was clicked, the first thing we do is get the music catalogue
         	//from a web service (really just an Amazon S3 bucket in this exercise)...
         	getMasterPlaylistViaAjax();  
@@ -33,6 +39,7 @@
 				}
 				//Drop the new album into the player...
 				dropAlbumInIFrame($songDiv);
+		
 				//Log the new event...
 				var artistId = $songDiv.attr("id");
 				var songUrl = songLocationMap[artistId];
@@ -70,6 +77,7 @@
 	function enablePlayerControls() {
 		//Make the play/pause button visible...
 		$(".playpause").fadeTo("slow", 0.0);
+		
 		//make the play/pause button clickable...
 		$(".playpause").click(function(e) {
 			if (audioPlayer.paused) {
@@ -87,8 +95,10 @@
 	function returnCurrentAlbumToTray() {
 		//Add the current album back to the bottom...
 		$(".bottombar").append("<div class='albumDiv' id=" + currentArtistId + " >" + $selectionDiv.html() + "</div>");
+		
 		//Make all albums draggable again, including the one that was loaded in the iPod...
 		makeAlbumsDraggable();
+		
 		//remove the current album from the IFrame...
 		$selectionDiv.children().remove(); 
 	}
@@ -101,10 +111,13 @@
 	function dropAlbumInIFrame($newArtist) {
 		$selectionDiv.css("padding-left", "0");
 		$selectionDiv.css("padding-top", "0");
+		
 		//inject the new album div's html into the IFrame called selectionDiv...
 		var $selection = $selectionDiv.html($newArtist.html());
+		
 		//set the global currentArtistId to the new album div's id...
 		currentArtistId = $newArtist.attr("id");
+		
 		//remove the selected album's div from the bottom catalogue tray...
 		$newArtist.remove();	
 	}
@@ -131,10 +144,12 @@
 		$.ajax({
   			url: "http://s3.amazonaws.com/clottonmusic/albuminfo/" + artistId,
 			crossdomain: true,
+			
 			//incomingJsonAlbumInfo is the web service's json response to this request, if successful...
   			success: function(incomingJsonAlbumInfo) {
 				var albumData = incomingJsonAlbumInfo;
 				console.log("Album Data Received : " + "album: " + albumData.album + " release date: " + albumData.date + " bio: " + albumData.bio);
+				
 				//update the UI with info about the newly playing album...
 				showMessage(albumData.album + " by " + artistId + ", " + albumData.date);
 				showAlbumBio(albumData.bio);
@@ -159,6 +174,7 @@
 			crossdomain: true,
   			success: function(incomingJsonPlaylist) {
 				playlistData = incomingJsonPlaylist;
+				
 				//Once we have the music catalogue from the service, fire up the UI and reference data...
 				initInterface(playlistData);
 				initSongLocationMap(playlistData);
@@ -190,14 +206,19 @@
 				id: item.artist
 			}).appendTo(".bottombar"));
 		});
+		
 		//assign the IFrame's selection div to a global jquery variable so we have a reference to it...
 		$selectionDiv = $("#playWindow").contents().find("#selection");
+		
 		//Make albums in the catalogue draggable by the user...
 		makeAlbumsDraggable();
+		
 		//Make the catalogue visible to the user...
 		showArtists();
+		
 		//enable the music player...
 		turnOnIpod();
+		
 		//create a reference to the HTML5 audio player from the IFrame...
 		audioPlayer = $("#playWindow").contents().find("#player")[0];
 		
