@@ -77,14 +77,27 @@
 		$selectionDiv.children().remove(); 
 	}
 	
+	/**
+	* Once a user has selected an album and moved it to the iPod for playing, inject the album div's html into Iframe.
+	* @method dropAlbumInIFrame
+	* @param $newArtist {Jquery Object} the <div> of the album being chosen for playback
+	*/
 	function dropAlbumInIFrame($newArtist) {
 		$selectionDiv.css("padding-left", "0");
 		$selectionDiv.css("padding-top", "0");
+		//inject the new album div's html into the IFrame called selectionDiv...
 		var $selection = $selectionDiv.html($newArtist.html());
+		//set the global currentArtistId to the new album div's id...
 		currentArtistId = $newArtist.attr("id");
+		//remove the selected album's div from the bottom catalogue tray...
 		$newArtist.remove();	
 	}
 
+	/**
+	* Plays the audio found at the incoming url.
+	* @method playNewSong
+	* @Param srcUrl {String} the url of an audio file
+	*/
 	function playNewSong(srcUrl) {
 		console.log("playSong received: " + srcUrl);
 		audioPlayer.src = srcUrl;
@@ -92,13 +105,21 @@
 		
 	}
 	
+	/**
+	* Loads album info such as album name, release date, biography via a GET request.  Expects json returned.
+	* @method getAlbumInfoViaAjax
+	* @param artistId {String} The album div's id, used as a search param by the 'server'.  
+	* An Amazon s3 bucket mimics a restful web service, with db backend.
+	*/
 	function getAlbumInfoViaAjax(artistId) {
 		$.ajax({
   			url: "http://s3.amazonaws.com/clottonmusic/albuminfo/" + artistId,
 			crossdomain: true,
+			//incomingJsonAlbumInfo is the server's json response to this request, if successful...
   			success: function(incomingJsonAlbumInfo) {
 				var albumData = incomingJsonAlbumInfo;
 				console.log("Album Data Received : " + "album: " + albumData.album + " release date: " + albumData.date + " bio: " + albumData.bio);
+				//update the UI with info about the newly playing album...
 				showMessage(albumData.album + " by " + artistId + ", " + albumData.date);
 				showAlbumBio(albumData.bio);
 				
@@ -111,7 +132,11 @@
 		});
 	}
 	
-	
+	/**
+	* Once the iPod has been powered up, this method requests the full catalogue info from the 'server".
+	* An Amazon s3 bucket is mimicing a restful web service, with db backend.
+	* @method getMasterPlaylistViaAjax
+	*/
 	function getMasterPlaylistViaAjax() {
 		$.ajax({
   			url: "http://s3.amazonaws.com/clottonmusic/playlists/masterplaylist",
@@ -151,7 +176,9 @@
 
 	}
 	
-	
+	/**
+	 * "Powers up" the IPod.  Makes the IFrame visible and enables controls.
+	 * /
 	function turnOnIpod() {
 		$selectionDiv.css("font-family", "Trebuchet MS");
 		$selectionDiv.css("font-size", "13px");
@@ -161,19 +188,38 @@
 		enablePlayerControls();		
 	}
 	
+	/**
+	 * Introduces the catalogue of music into the UI's field of view by sliding it into place.
+	 * @method showArtists
+	 * /
 	function showArtists() {
 		$(".bottombar").animate({width:"show"}, "slow");	
 	}
 	
+	/**
+	 * Introduces the biography or "factoid" about the currently playing album into the UI's field of view with a grow effect.
+	 * @method showAlbumBio
+	 * @param bio {String} The text making up the information to be read by the user.
+	 * /
 	function showAlbumBio(bio) {
 		$("#albumInfoDiv").html(bio);
 		$("#albumInfoDiv").show("scale", 400);
 	}
 	
+	/**
+	 * Shows the given text in the message area of the UI, ie, the top bar.  Uses a slide effect.
+	 * @method showMessage
+	 * @param newMessageString {String} the message to show.
+	 * /
 	function showMessage(newMessageString) {
 		$("#message").html(newMessageString);
 		$("#message").show("slide",{direction: "right"},  500);
 	}
+	
+	/**
+	 * Makes any album div draggable by the user.
+	 * @method makeAlbumsDraggable
+	 * /
 	function makeAlbumsDraggable() {
 		$(".albumDiv").draggable({iframeFix: true, revert: function (event, ui) { return !event; } } );
 	}
