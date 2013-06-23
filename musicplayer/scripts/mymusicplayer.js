@@ -5,26 +5,37 @@
 	var $selectionDiv = null;
 	
 	$(document).ready(function() {
+		//If it can be hiddlen, hide it at the start, before the application is "powered on" by the user....
 		$(".hideable").hide();
+		//Anything that is "startable" can be clicked and has the ability to "power on" the application...
 		$(".startable").click(function(e) {
+        	//If something that can start the application was clicked, the first thing we do is get the music catalogue
+        	//from a web service (really just an Amazon S3 bucket in this exercise)...
         	getMasterPlaylistViaAjax();  
 			$(".startable").unbind("click");
 		});
 		
+		//The playWindow is the screen of the IPod, which is actually an IFrame.
+		//Here we define the action upon an album being dropped into this IFrame...
 		$("#playWindow").droppable({
 			drop: function(event, ui) {
 				
 				var $songDiv = ui.draggable;
 				
+				//If an album was already playing, return it to the catalogue tray at the bottom of the UI.
 				if (currentArtistId != null) {
 					returnCurrentAlbumToTray();
 				}
+				//Drop the new album into the player...
 				dropAlbumInIFrame($songDiv);
+				//Log the new event...
 				var artistId = $songDiv.attr("id");
 				var songUrl = songLocationMap[artistId];
 				console.log("Artist Id: " + artistId);
 				console.log("Song URL: " + songUrl);
 				
+				//Start playing the new song, and call our web service to fetch an interesting factoid
+				//about what is playing...
 				playNewSong(songUrl);
 				getAlbumInfoViaAjax(artistId);
 				
