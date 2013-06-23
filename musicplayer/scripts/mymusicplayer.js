@@ -34,6 +34,11 @@
 		
 	});
 	
+	/**
+	* Initializes a key/value map of artist's names and their corresponding song file url.
+	* @method initSongLocationMap
+	* @param data {Object} The object representing a list of artists/urls
+	*/
 	function initSongLocationMap(jsonData) {
 		songLocationMap = new Object();
 		$.each(jsonData, function (i, item) {
@@ -42,8 +47,14 @@
 		});
 	}
 	
+	/**
+	* "powers up" the iPod's controls, and makes them available for user interaction.
+	* @method enablePlayerControls
+	*/
 	function enablePlayerControls() {
+		//Make the play/pause button visible...
 		$(".playpause").fadeTo("slow", 0.0);
+		//make the play/pause button clickable...
 		$(".playpause").click(function(e) {
 			if (audioPlayer.paused) {
 				audioPlayer.play();
@@ -53,10 +64,17 @@
 		});
 	}
 	
+	/**
+	* Once a new album has been selected, returns the currently selected album to the bottom catalogue 'tray'.
+	* @method returnCurrentAlbumToTray
+	*/
 	function returnCurrentAlbumToTray() {
+		//Add the current album back to the bottom...
 		$(".bottombar").append("<div class='albumDiv' id=" + currentArtistId + " >" + $selectionDiv.html() + "</div>");
+		//Make all albums draggable again, including the one that was loaded in the iPod...
 		makeAlbumsDraggable();
-		$selectionDiv.children().remove();
+		//remove the current album from the IFrame...
+		$selectionDiv.children().remove(); 
 	}
 	
 	function dropAlbumInIFrame($newArtist) {
